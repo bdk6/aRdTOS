@@ -54,7 +54,7 @@ static void run_tasks()
 static void run_itasks()
 {
   uint8_t idx;
-  running_itasks = 1;
+  running_itasks = 1;   // Tell everyone we are running itasks now
   
   for(idx=0; idx<num_itasks; idx++)
   {
@@ -72,7 +72,7 @@ static void run_itasks()
       }
     }
   }
-  running_itasks = 0;
+  running_itasks = 0;   // Tell them we aren't
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -88,26 +88,17 @@ int OS_Init(uint8_t tasks, uint8_t itasks)
   int rtn = 0;
 
   // set task counts
-  //if(sizeof(TaskList) != 0)
-  {
-    //num_tasks = sizeof(TaskList)/sizeof(Task_t);
-    num_tasks = tasks;
-  }
-  //if(sizeof(ITaskList) != 0)
-  {
-    //num_itasks = sizeof(ITaskList)/sizeof(ITask_t);
-    num_itasks = itasks;
-  }
-
+  num_tasks = tasks;
+  num_itasks = itasks;
+ 
   // setup timer
   // Only works on 328p (168?, 88?)
-  // Must create macros for others (see wiring.c)
+  // TODO:  Must create macros for others (see wiring.c)
   OCR0A = 20;  // just get away from 0 a bit
   TIMSK0 |= 2;  // enable the compare A interrupt
   
 
   // init task states?
-
 
   return rtn;
 }
@@ -126,7 +117,6 @@ int OS_Run()
   {
     run_tasks();
   }
-
 
   return rtn;
 }
@@ -169,36 +159,59 @@ void OS_Deactivate()
 }
 
 //////////////////////////////////////////////////////////////////////////////
-///  @function OS_Deactivate
+///  @function OS_DeactivateTask
 ///  @brief Deactivates a regular task
 ///  
 ///  @param[in] uint8_t task: The regular task to deactivate
 //////////////////////////////////////////////////////////////////////////////
 void OS_DeactivateTask(uint8_t task)
 {
-  
+  if(task < num_tasks)
+  {
+    TaskList[task].state = STATE_INACTIVE;
+  }
 }
 //////////////////////////////////////////////////////////////////////////////
-///  @function OS_Deactivate
-///  @brief Deactivates a regular task
+///  @function OS_DeactivateITask
+///  @brief Deactivates an itask
 ///  
-///  @param[in] uint8_t task: The regular task to deactivate
+///  @param[in] uint8_t task: The itask to deactivate
 //////////////////////////////////////////////////////////////////////////////
-void OS_ActivateTask(uint8_t task);
+void OS_DeactivateITask(uint8_t task)
+{
+  if(task < num_itasks)
+  {
+    ITaskList[task].state = STATE_INACTIVE;
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////////
-///  @function OS_Deactivate
-//////////////////////////////////////////////////////////////////////////////
-///  @function OS_Deactivate
-///  @brief Deactivates a regular task
+///  @function OS_ActivateTask
+///  @brief Activates a regular task
 ///  
-///  @param[in] uint8_t task: The regular task to deactivate
+///  @param[in] uint8_t task: The regular task to activate
 //////////////////////////////////////////////////////////////////////////////
-///  @brief Deactivates a regular task
+void OS_ActivateTask(uint8_t task)
+{
+  if(task < num_tasks)
+  {
+    TaskList[task].state = STATE_READY;
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+///  @function OS_ActivateITask
+///  @brief Activates an itask.
 ///  
-///  @param[in] uint8_t task: The regular task to deactivate
+///  @param[in] uint8_t task: The itask to deactivate
 //////////////////////////////////////////////////////////////////////////////
-void OS_DeactivateITask(uint8_t task);
-void OS_ActivateTask(uint8_t task);
+void OS_ActivateITask(uint8_t task)
+{
+  if(task < num_itasks)
+  {
+    ITaskList[task].state = STATE_READY;
+  }
+}
 
 //////////////////////////////////////////////////////////////////////////////
 ///  @function ISR
@@ -206,7 +219,7 @@ void OS_ActivateTask(uint8_t task);
 //////////////////////////////////////////////////////////////////////////////
 
 // TODO:  get conditional code for different uCs
-// ISR(
+
 ISR(TIMER0_COMPA_vect)
 {
   timer_ticks++;

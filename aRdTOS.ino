@@ -5,37 +5,13 @@
 ///  @brief implements simple RTOS
 ///////////////////////////////////////////////////////////////////
 
-//#include "Timers.h"
 #include "OS.h"
 
 #define NUM_TASKS  2
 #define NUM_ITASKS 8
 
-typedef void (*Task_p)();
-typedef void (*ITask_p)();
-
-
-/*
-int isr_count = 0;
-
-
-
-void task1();
-void task2();
-Task_t t1 = {task1, true};
-Task_t t2 = {task2, true};
-
-Task_t a_tasks[NUM_TASKS]=
-{
-  t1,
-  t2
-};
-
-
-ITask_t a_itasks[NUM_ITASKS];
-int next_task = 0;
-int next_itask = 0;
-*/
+//typedef void (*Task_p)();
+//typedef void (*ITask_p)();
 
 ///////////////////////////////////////
 ///////////////////////////////////////
@@ -56,7 +32,13 @@ void task2()
 void itask1()
 {
   static uint8_t on = 0;
+  static uint8_t cycles = 6;
 
+  if(--cycles == 0)
+  {
+    OS_ActivateITask(1);
+    OS_Deactivate();
+  }
   if(on == 0)
   {
     on = 1;
@@ -83,21 +65,18 @@ void itask2()
     on = 0;
     digitalWrite(13, LOW);
   }
- // itask_cnt++;
 }
 
 
-//Task_t TaskList[] = 
-//{
 TASKLIST
-  TASK(task1, 10, 1000)
-  TASK(task2, 0, 20)
+  TASK(task1, 10, 1000, 0)
+  TASK(task2, 0, 20, 1)
   
 ENDLIST
 
 ITASKLIST
-  ITASK(itask1, 0, 2000)
-  ITASK(itask2, 0, 1000)
+  ITASK(itask1, 0, 2000, 1)
+  ITASK(itask2, 0, 1000, 0)
 ENDLIST
 
 
@@ -109,7 +88,6 @@ void setup()
   Serial.println("setup()");
   pinMode(13, OUTPUT);
   pinMode(12, OUTPUT);
-  //OS_Init();
   OS_Setup();
 }
 
@@ -118,29 +96,8 @@ void setup()
 void loop()
 {
   Serial.println("loop()");
-  //runTasks();
   OS_Run();
 }
 
-/*
-ISR(TIMER1_OVF_vect)
-{
-  isr_count++;
-}
-
-/*
-ISR(TIMER0_OVF_vect)
-{
-  isr_count++;
-  
-}
-*/
-
-/*
-ISR(TIMER2_COMPB_vect)
-{
-  isr_count++;
-}
-*/
 
 

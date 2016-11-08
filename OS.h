@@ -11,10 +11,12 @@
 
 typedef enum _OS_State_t
 {
-  STATE_RUN,        // Running state
-  STATE_READY,      // Task is ready to run
-  STATE_WAIT_TIME,  // Waiting for elapsed time
-  STATE_INACTIVE,   // Task is deactivated
+  // The first two states MUST remain in those positions
+  // So the initialization macros work right
+  STATE_INACTIVE = 0,   // Task is deactivated
+  STATE_READY    = 1,   // Task is ready to run
+  STATE_RUN,            // Task is currently running (not used)
+  STATE_WAIT_TIME,      // Waiting for elapsed time
 
   STATE_MAX,        // highest number of state
   STATE_INVALID     // something's wrong
@@ -52,8 +54,8 @@ typedef struct _ITask_t
 #define TASKLIST Task_t TaskList[] = {
 #define ENDLIST };
 #define ITASKLIST ITask_t ITaskList[] = {
-#define TASK(f,w,c)   { .fn=(f), .wait=(w), .wait_cycle = (c), .state = STATE_READY },
-#define ITASK(f,w,c)   { .fn=(f), .wait=(w), .wait_cycle = (c), .state = STATE_READY },
+#define TASK(f,w,c,s)   { .fn=(f), .wait=(w), .wait_cycle = (c), .state = (s) },
+#define ITASK(f,w,c,s)   { .fn=(f), .wait=(w), .wait_cycle = (c), .state = (s) },
 
 
 int OS_Init(uint8_t tasks, uint8_t itasks);
@@ -63,7 +65,7 @@ void OS_Deactivate();
 void OS_DeactivateTask(uint8_t task);
 void OS_ActivateTask(uint8_t task);
 void OS_DeactivateITask(uint8_t task);
-void OS_ActivateTask(uint8_t task);
+void OS_ActivateITask(uint8_t task);
 
 extern uint32_t timer_ticks;
 extern int itask_cnt;
