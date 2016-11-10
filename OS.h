@@ -2,11 +2,18 @@
 ///  @file OS.h
 ///  @copyright 2016 William R Cooke
 ///  @brief  Interface for aRdTOS simple Arduino RTOS
+///  @version 0.0.1
 //////////////////////////////////////////////////////////////////////////////
 
 #ifndef _OS_H_
 #define _OS_H_
 
+#define VERSION_MAJOR 0
+#define VERSION_MINOR 0
+#define VERSION_BUILD 1
+
+#define TASK_ACTIVE 1
+#define TASK_INACTIVE 0
 #include <Arduino.h>
 
 typedef enum _OS_State_t

@@ -7,14 +7,9 @@
 
 #include "OS.h"
 
-#define NUM_TASKS  2
-#define NUM_ITASKS 8
-
-//typedef void (*Task_p)();
-//typedef void (*ITask_p)();
-
-///////////////////////////////////////
-///////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+//  Two regular task definitions
+///////////////////////////////////////////////////////////////////
 
 void task1()
 {
@@ -28,6 +23,10 @@ void task2()
   Serial.println(itask_cnt);
   delay(500);
 }
+
+///////////////////////////////////////////////////////////////////
+//  Two Interrupt Task definitions
+///////////////////////////////////////////////////////////////////
 
 void itask1()
 {
@@ -51,6 +50,7 @@ void itask1()
   }
   itask_cnt++;
 }
+
 void itask2()
 {
   static uint8_t on = 0;
@@ -67,6 +67,15 @@ void itask2()
   }
 }
 
+/////////////////////////////////////////////////////
+//  the two task tables are the 
+//  main structure of your program
+//  The task parameters are:
+//  name:  name of the function to use as this task
+//  start:  starting time in ticks
+//  cycle:  the number of ticks between runs
+//  active:  1 if task should run, 0 if paused
+/////////////////////////////////////////////////////
 
 TASKLIST
   TASK(task1, 10, 1000, 0)
@@ -81,7 +90,9 @@ ENDLIST
 
 
 //////////////////////////////////////////
-///////////////////////////////////////////
+//  The typical setup() with OS_Setup()
+//////////////////////////////////////////
+
 void setup()
 {
   Serial.begin(9600);
@@ -91,7 +102,10 @@ void setup()
   OS_Setup();
 }
 
-
+//////////////////////////////////////////
+//   loop() will include OS_Run()
+//   which then takes over control
+//////////////////////////////////////////
 
 void loop()
 {

@@ -2,6 +2,7 @@
 ///  @file OS.cpp
 ///  @copyright 2016 William R Cooke
 ///  @brief  Implementation of aRdTOS simple Arduino RTOS
+///  @version 0.0.1
 //////////////////////////////////////////////////////////////////////////////
 
 #include <Arduino.h>
